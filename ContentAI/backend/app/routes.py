@@ -22,11 +22,6 @@ class GenerationRequest(BaseModel):
 
 @router.post("/generate")
 async def generate_post(request: GenerationRequest):
-    return {"post": "This is a dummy post for testing purposes."}
-
-"""
-@router.post("/generate")
-async def generate_post(request: GenerationRequest):
     if generator is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
     
@@ -45,7 +40,7 @@ async def generate_post(request: GenerationRequest):
         return {"post": generated_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generation error: {e}")
-"""
+
 @router.get("/")
 async def root():
     return {"message": "Welcome to the Danish Social Media Post Generator API!"}
