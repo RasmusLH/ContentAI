@@ -6,19 +6,13 @@ router = APIRouter()
 
 
 try:
-    generator = pipeline("text2text-generation", model="google/mt5-small")
+    generator = pipeline("text-generation", model="openai-community/gpt2", tokenizer="openai-community/gpt2", truncation=True)
 except Exception as e:
     # Log the error if needed, but for now, we can simply pass
     raise HTTPException(status_code=500, detail=f"Model load error: {e}")
 
 class GenerationRequest(BaseModel):
     objective: str
-    tone: str  # e.g., 'friendly', 'professional', 'humorous', etc.
-    hashtags: str = ""
-    context: str = ""
-    apply_danish_enhancements: bool = True
-    formality: str = "casual"
-
 
 @router.post("/generate")
 async def generate_post(request: GenerationRequest):
@@ -27,13 +21,6 @@ async def generate_post(request: GenerationRequest):
     
     # Construct an English prompt based on user inputs.
     english_prompt = f"Create a social media post about: {request.objective}. "
-    english_prompt += f"Tone: {request.tone}. "
-    if request.hashtags:
-        english_prompt += f"Include hashtags: {request.hashtags}. "
-    if request.context:
-        english_prompt += f"Context: {request.context}. "
-    english_prompt += f"Formality: {request.formality}. "
-    english_prompt += " Ensure the post is culturally tuned for a Danish audience."
     
     try:
         # Translate the English prompt to Danish.
@@ -47,4 +34,4 @@ async def generate_post(request: GenerationRequest):
 
 @router.get("/")
 async def root():
-    return {"message": "Welcome to the Danish Social Media Post Generator API!"}
+    return {"message": "Welcome to the Social Media Post Generator API!"}

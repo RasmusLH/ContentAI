@@ -7,11 +7,6 @@ interface GenerationResponse {
 const PostGenerator: React.FC = () => {
   // State for form inputs
   const [objective, setObjective] = useState("");
-  const [tone, setTone] = useState("friendly");
-  const [hashtags, setHashtags] = useState("");
-  const [context, setContext] = useState("");
-  const [applyEnhancements, setApplyEnhancements] = useState(true);
-  const [formality, setFormality] = useState("casual");
 
   // State for API call status and result
   const [isLoading, setIsLoading] = useState(false);
@@ -25,12 +20,7 @@ const PostGenerator: React.FC = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          objective,
-          tone,
-          hashtags,
-          context,
-          apply_danish_enhancements: applyEnhancements,
-          formality,
+          objective
         }),
       });
       const data: GenerationResponse = await response.json();
@@ -45,7 +35,7 @@ const PostGenerator: React.FC = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Danish Social Media Post Generator</h1>
+      <h1>Social Media Post Generator</h1>
       <p>Create engaging posts for Instagram and Facebook</p>
 
       <div>
@@ -58,74 +48,6 @@ const PostGenerator: React.FC = () => {
           onChange={(e) => setObjective(e.target.value)}
           style={{ width: "100%", marginBottom: "10px" }}
         />
-      </div>
-
-      <div>
-        <label>
-          <strong>Select the tone for your post:</strong>
-        </label>
-        <div>
-          {["friendly", "professional", "humorous", "custom"].map((t) => (
-            <label key={t} style={{ marginRight: "10px" }}>
-              <input
-                type="radio"
-                name="tone"
-                value={t}
-                checked={tone === t}
-                onChange={(e) => setTone(e.target.value)}
-              />
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ marginTop: "10px" }}>
-        <label>
-          <strong>Hashtags / Mentions:</strong>
-        </label>
-        <input
-          type="text"
-          value={hashtags}
-          onChange={(e) => setHashtags(e.target.value)}
-          style={{ width: "100%", marginBottom: "10px" }}
-        />
-      </div>
-
-      <div>
-        <label>
-          <strong>Additional Context (optional):</strong>
-        </label>
-        <textarea
-          value={context}
-          onChange={(e) => setContext(e.target.value)}
-          style={{ width: "100%", marginBottom: "10px" }}
-        />
-      </div>
-
-      <div>
-        <label>
-          <strong>Apply Danish cultural enhancements:</strong>
-        </label>
-        <input
-          type="checkbox"
-          checked={applyEnhancements}
-          onChange={(e) => setApplyEnhancements(e.target.checked)}
-        />
-      </div>
-
-      <div style={{ marginTop: "10px" }}>
-        <label>
-          <strong>Formality Level:</strong>
-        </label>
-        <select
-          value={formality}
-          onChange={(e) => setFormality(e.target.value)}
-          style={{ marginLeft: "10px" }}
-        >
-          <option value="casual">Casual</option>
-          <option value="formal">Formal</option>
-        </select>
       </div>
 
       <div style={{ marginTop: "20px" }}>
