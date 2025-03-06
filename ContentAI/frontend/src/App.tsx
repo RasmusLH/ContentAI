@@ -1,4 +1,4 @@
-
+import "./App.css";
 import React from "react";
 import PostGenerator from "./components/PostGenerator";
 

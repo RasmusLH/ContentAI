@@ -1,9 +1,33 @@
-.App {
-  text-align: center;
+/* Base styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f9fc;
+  color: #333;
 }
 
+/* App container */
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Header styling with LinkedIn blue */
+.App-header {
+  background-color: #0077b5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 20px;
+}
+
+/* Logo styling */
 .App-logo {
-  height: 40vmin;
+  height: 80px;
+  margin-bottom: 20px;
   pointer-events: none;
 }
 
@@ -13,19 +37,58 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
+/* Link styling */
 .App-link {
   color: #61dafb;
+  text-decoration: none;
+}
+
+/* Button styling */
+button {
+  background-color: #0077b5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #005d8c;
+}
+
+/* Input and textarea styling */
+input[type="text"],
+textarea {
+  border: 1px solid #0077b5;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 600px) {
+  .App-header {
+    padding: 10px;
+  }
+  button {
+    width: 100%;
+  }
 }
 
 @keyframes App-logo-spin {
