@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from app.routes import router as generate_router
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Danish Social Media Post Generator MVP")
+app = FastAPI(title="LinkedIn Post Generator")
 
 app.add_middleware(
     CORSMiddleware,

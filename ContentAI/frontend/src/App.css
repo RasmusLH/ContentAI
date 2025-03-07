@@ -15,7 +15,7 @@ body {
 /* Header styling with LinkedIn blue */
 .App-header {
   background-color: #0077b5;
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -153,7 +153,7 @@ textarea {
 .app-footer {
   background-color: #2c3e50;
   color: white;
-  padding: 2rem 0;
+  padding: 0.5rem 0;
   margin-top: auto;
 }
 
@@ -167,7 +167,7 @@ textarea {
 }
 
 .footer-section h3, .footer-section h4 {
-  margin-top: 0;
+  margin-top: 0.5rem;
 }
 
 .footer-section ul {

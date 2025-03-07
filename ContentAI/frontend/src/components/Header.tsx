@@ -4,7 +4,7 @@ const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="header-content">
-        <h1>ContentAI</h1>
+        <h1>LinkedIn Post Creator</h1>
         <nav>
           <ul>
             <li><a href="/">Home</a></li>

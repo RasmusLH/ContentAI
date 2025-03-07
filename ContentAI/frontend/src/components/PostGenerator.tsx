@@ -35,8 +35,7 @@ const PostGenerator: React.FC = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Social Media Post Generator</h1>
-      <p>Create engaging posts for Instagram and Facebook</p>
+      <p>Create engaging posts for LinkedIn</p>
 
       <div>
         <label>
