@@ -161,20 +161,19 @@ const PostGenerator: React.FC = () => {
             {isLoading ? "Generating..." : "Generate Post"}
           </button>
         </div>
-
-        {isLoading && (
-          <div className="loading-indicator">
-            <p>Generating your post...</p>
-            <div className="progress-bar">
-              <div className="progress-bar-fill" />
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="post-generator-preview">
         <div className="preview-content">
           <h3>Post Preview</h3>
+          {isLoading && (
+            <div className="preview-loading-overlay">
+              <p>Crafting your LinkedIn post...</p>
+              <div className="progress-bar">
+                <div className="progress-bar-fill" />
+              </div>
+            </div>
+          )}
           {generatedPost ? (
             <>
               <textarea

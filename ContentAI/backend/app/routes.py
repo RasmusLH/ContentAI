@@ -4,7 +4,6 @@ from transformers import pipeline
 import logging
 from enum import Enum
 from typing import Optional
-import torch
 
 router = APIRouter()
 
@@ -13,11 +12,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 try:
-    # Initialize the text-generation pipeline with a better model for long-form content
+    # Initialize with a simpler text2text model
     generator = pipeline("text2text-generation",
-                        model="google/byt5-base",
-                        tokenizer="google/byt5-base",
-                        device="cuda" if torch.cuda.is_available() else "cpu")
+                        model="google/flan-t5-small",  # Smaller model that works with TensorFlow
+                        tokenizer="google/flan-t5-small")
     logger.info("Model loaded successfully")
 except Exception as e:
     logger.error(f"Model load error: {e}")
@@ -50,7 +48,7 @@ async def generate_post(request: GenerationRequest):
     template_base = TEMPLATE_PROMPTS.get(request.template)
     
     english_prompt = (
-        "Task: Generate a detailed professional LinkedIn post (minimum 500 words).\n\n"
+        "Task: Generate a detailed professional LinkedIn post of MINIMUM 500 words.\n\n"
         f"Style: {template_base}\n"
         f"Topic: {request.objective}\n"
         f"Additional Context: {request.context}\n\n"
@@ -76,17 +74,11 @@ async def generate_post(request: GenerationRequest):
     try:
         result = generator(
             english_prompt,
-            num_return_sequences=1,
-            truncation=True,
-            max_length=2048,  # Add explicit max_length
-            pad_token_id=generator.tokenizer.eos_token_id,
-            max_new_tokens=2048,  # Ensure this does not exceed max_length
-            min_new_tokens=512,   # Enforce minimum length
-            top_k=50,
-            temperature=0.8,
+            max_length=512,       # Reduced max length for faster generation
+            min_length=64,        # Minimum length to ensure some content
             do_sample=True,
-            repetition_penalty=1.2,  # Prevent repetitive text
-            no_repeat_ngram_size=3   # Prevent phrase repetition
+            temperature=0.7,      # Slightly reduced temperature
+            num_return_sequences=1
         )
         logger.info(f"Generation result: {result}")
         
