@@ -1,35 +1,17 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Query
 from transformers import pipeline
 import logging
-from enum import Enum
-from typing import Optional
+from typing import Optional, List
+from .database import db
+from .models import StoredPost, StoredPrompt
+from .schemas import TemplateType, GenerationRequest, TEMPLATE_PROMPTS
+from datetime import datetime
 
 # Move constants to top
 MAX_TOKENS = 512
 MIN_TOKENS = 64
 MIN_WORDS = 200
 TEMPERATURE = 0.7
-
-class TemplateType(str, Enum):
-    TECH_INSIGHT = "tech-insight"
-    STARTUP_STORY = "startup-story"
-    PRODUCT_LAUNCH = "product-launch"
-    INDUSTRY_UPDATE = "industry-update"
-
-class GenerationRequest(BaseModel):
-    template: TemplateType
-    objective: str = Field(..., min_length=10, max_length=500)
-    context: str = Field(..., min_length=10, max_length=1000)
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "template": "tech-insight",
-                "objective": "Discuss the impact of AI on software development",
-                "context": "Recent advancements in AI tools and their adoption in dev teams"
-            }
-        }
 
 class GenerationService:
     def __init__(self):
@@ -63,7 +45,7 @@ class GenerationService:
 generator_service = GenerationService()
 
 # Router setup and route handlers
-router = APIRouter(prefix="/api/v1", tags=["generation"])
+router = APIRouter(tags=["generation"])
 
 @router.post("/generate", response_model=dict)
 async def generate_post(request: GenerationRequest):
@@ -75,10 +57,56 @@ async def generate_post(request: GenerationRequest):
         
         if len(processed_text.split()) < MIN_WORDS:
             return await generate_post(request)
+        
+        # Store the generated post
+        stored_post = StoredPost(
+            template=request.template,
+            objective=request.objective,
+            context=request.context,
+            generated_content=processed_text
+        )
+        await db.posts_collection.insert_one(stored_post.dict(by_alias=True))
+        
+        # Update or create prompt
+        await db.prompts_collection.update_one(
+            {
+                "template": request.template,
+                "objective": request.objective,
+                "context": request.context
+            },
+            {
+                "$inc": {"use_count": 1},
+                "$setOnInsert": {
+                    "created_at": datetime.utcnow()
+                }
+            },
+            upsert=True
+        )
             
         return {"post": processed_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/history", response_model=List[StoredPost])
+async def get_post_history(
+    limit: int = Query(10, gt=0, le=100),
+    skip: int = Query(0, ge=0),
+):
+    """Retrieve generation history"""
+    cursor = db.posts_collection.find()
+    cursor.sort("created_at", -1).skip(skip).limit(limit)
+    posts = await cursor.to_list(length=limit)
+    return posts
+
+@router.get("/popular-prompts", response_model=List[StoredPrompt])
+async def get_popular_prompts(
+    limit: int = Query(5, gt=0, le=20)
+):
+    """Retrieve most used prompts"""
+    cursor = db.prompts_collection.find()
+    cursor.sort("use_count", -1).limit(limit)
+    prompts = await cursor.to_list(length=limit)
+    return prompts
 
 # Helper functions
 def create_generation_prompt(template: str, request: GenerationRequest) -> str:
@@ -110,14 +138,3 @@ def process_generated_text(text: str) -> str:
     if "Generated Post:" in text:
         return text.split("Generated Post:", 1)[1].strip()
     return text.strip()
-
-TEMPLATE_PROMPTS = {
-    TemplateType.TECH_INSIGHT: "Create a LinkedIn post discussing technology trends, focusing on innovation impact and future implications.",
-    TemplateType.STARTUP_STORY: "Write an inspiring LinkedIn post about a startup journey, highlighting key milestones, challenges overcome, and lessons learned.",
-    TemplateType.PRODUCT_LAUNCH: "Craft an engaging LinkedIn announcement about a new product launch, emphasizing unique features and customer benefits.",
-    TemplateType.INDUSTRY_UPDATE: "Compose a LinkedIn post analyzing industry trends, market developments, and their business implications."
-}
-
-@router.get("/")
-async def root():
-    return {"message": "Welcome to the Social Media Post Generator API!"}

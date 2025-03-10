@@ -2,3 +2,6 @@ fastapi
 uvicorn
 transformers
 tensorflow
+motor
+pymongo[srv]
+python-dotenv

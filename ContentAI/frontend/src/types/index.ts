@@ -16,3 +16,15 @@ export interface Template {
     label: string;
     description: string;
 }
+
+export interface StoredPost extends GenerationRequest {
+    _id: string;
+    generated_content: string;
+    created_at: string;
+}
+
+export interface StoredPrompt extends GenerationRequest {
+    _id: string;
+    created_at: string;
+    use_count: number;
+}
