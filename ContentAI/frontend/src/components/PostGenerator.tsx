@@ -1,40 +1,8 @@
 import React, { useState, ChangeEvent } from "react";
-
-interface GenerationResponse {
-  post: string;
-}
-
-type TemplateType = "tech-insight" | "startup-story" | "product-launch" | "industry-update";
-
-interface GenerationRequest {
-  template: TemplateType;
-  objective: string;
-  context: string;
-  documents?: File[];
-}
-
-const templates = [
-  { 
-    id: "tech-insight", 
-    label: "Tech Insight",
-    description: "Share technology trends and insights"
-  },
-  { 
-    id: "startup-story", 
-    label: "Startup Story",
-    description: "Tell your startup journey"
-  },
-  { 
-    id: "product-launch", 
-    label: "Product Launch",
-    description: "Announce new products or features"
-  },
-  { 
-    id: "industry-update", 
-    label: "Industry Update",
-    description: "Share market trends and analysis"
-  }
-];
+import { TemplateType } from "../types"; // Add this line to import TemplateType
+import { GenerationRequest, GenerationResponse } from "../types";
+import { TEMPLATES } from "../constants";
+import { generatePost } from "../services/api";
 
 const PostGenerator: React.FC = () => {
   const [formData, setFormData] = useState<GenerationRequest>({
@@ -45,6 +13,7 @@ const PostGenerator: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [generatedPost, setGeneratedPost] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleTemplateSelect = (templateId: TemplateType) => {
     setFormData(prev => ({
@@ -66,21 +35,15 @@ const PostGenerator: React.FC = () => {
   const handleGenerate = async () => {
     setIsLoading(true);
     setGeneratedPost("");
+    setError(null);
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          template: formData.template,
-          objective: formData.objective,
-          context: formData.context,
-        }),
-      });
-      const data: GenerationResponse = await response.json();
-      setGeneratedPost(data.post);
+      const response = await generatePost(formData);
+      setGeneratedPost(response.post);
     } catch (error) {
       console.error("Error generating post:", error);
-      setGeneratedPost("Error generating post. Please try again.");
+      setError("Failed to generate post. Please try again.");
+      setGeneratedPost("");
     } finally {
       setIsLoading(false);
     }
@@ -96,11 +59,11 @@ const PostGenerator: React.FC = () => {
             <strong>Select Template</strong>
           </label>
           <div className="template-buttons">
-            {templates.map(template => (
+            {TEMPLATES.map(template => (
               <button
                 key={template.id}
                 className={`template-button ${formData.template === template.id ? 'active' : ''}`}
-                onClick={() => handleTemplateSelect(template.id as TemplateType)}
+                onClick={() => handleTemplateSelect(template.id)}
                 type="button"
               >
                 <div className="template-button-content">
@@ -138,6 +101,12 @@ const PostGenerator: React.FC = () => {
           </label>
         </div>
 
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
         <div className="form-group">
           <label>
             <strong>Supporting Documents</strong>
@@ -157,7 +126,10 @@ const PostGenerator: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <button onClick={handleGenerate} disabled={isLoading}>
+          <button 
+            onClick={handleGenerate} 
+            disabled={isLoading || !formData.objective || !formData.context}
+          >
             {isLoading ? "Generating..." : "Generate Post"}
           </button>
         </div>
