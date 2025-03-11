@@ -14,14 +14,15 @@ class GenerationRequest(BaseModel):
     objective: str = Field(..., min_length=10, max_length=500)
     context: str = Field(..., min_length=10, max_length=1000)
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "template": "tech-insight",
                 "objective": "Discuss the impact of AI on software development",
                 "context": "Recent advancements in AI tools and their adoption in dev teams"
             }
         }
+    }
 
 TEMPLATE_PROMPTS = {
     TemplateType.TECH_INSIGHT: "Create a LinkedIn post discussing technology trends, focusing on innovation impact and future implications.",

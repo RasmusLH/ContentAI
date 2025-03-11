@@ -4,7 +4,7 @@ from typing import Optional
 from .schemas import TemplateType
 
 class StoredPost(BaseModel):
-    id: Optional[str] = Field(None, alias="_id")
+    id: Optional[str] = Field(default=None, alias="_id")  # Let MongoDB handle ID
     template: TemplateType
     objective: str
     context: str
@@ -12,9 +12,9 @@ class StoredPost(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class StoredPrompt(BaseModel):
-    id: Optional[str] = Field(None, alias="_id")
+    id: Optional[str] = Field(default=None, alias="_id")  # Let MongoDB handle ID
     template: TemplateType
     objective: str
     context: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    use_count: int = 0
+    use_count: int = 1  # Start at 1 since it's being used

@@ -1,7 +1,9 @@
 fastapi
 uvicorn
 transformers
-tensorflow
+torch
+sentencepiece
 motor
 pymongo[srv]
 python-dotenv
+pydantic-settings

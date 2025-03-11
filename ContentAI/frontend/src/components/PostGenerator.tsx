@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
-import { TemplateType } from "../types"; // Add this line to import TemplateType
-import { GenerationRequest, GenerationResponse } from "../types";
+import { TemplateType } from "../types";
+import { GenerationRequest } from "../types";
 import { TEMPLATES } from "../constants";
 import { generatePost } from "../services/api";
 
@@ -38,11 +38,32 @@ const PostGenerator: React.FC = () => {
     setError(null);
 
     try {
+      console.log('Starting post generation with data:', formData);
       const response = await generatePost(formData);
+      console.log('Generation successful:', response);
       setGeneratedPost(response.post);
     } catch (error) {
       console.error("Error generating post:", error);
-      setError("Failed to generate post. Please try again.");
+      let errorMsg = "";
+      if (error instanceof Error) {
+        errorMsg = error.message;
+      } else {
+        errorMsg = "An unknown error occurred.";
+      }
+      // Enhance error with hints based on common issues
+      if (errorMsg.toLowerCase().includes("http error")) {
+        errorMsg += " Please ensure the backend server is running, the API endpoint is correct, and CORS settings are properly configured.";
+      }
+      if (errorMsg.toLowerCase().includes("not found")) {
+        errorMsg += " It appears the endpoint may be incorrect. Verify that the URL in the configuration matches your backend.";
+      }
+      if (errorMsg.toLowerCase().includes("generated text too short")) {
+        errorMsg += " The generated post is too short; consider adjusting your inputs or waiting while we improve generation parameters.";
+      }
+      if (!errorMsg) {
+        errorMsg = "An unexpected error occurred. Please try again later.";
+      }
+      setError(`Post generation failed: ${errorMsg}`);
       setGeneratedPost("");
     } finally {
       setIsLoading(false);
