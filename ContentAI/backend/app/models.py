@@ -18,3 +18,11 @@ class StoredPrompt(BaseModel):
     context: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     use_count: int = 1  # Start at 1 since it's being used
+
+class User(BaseModel):
+    id: str = Field(default=None, alias="_id")
+    email: str
+    name: str
+    picture: Optional[str] = None
+    google_id: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)

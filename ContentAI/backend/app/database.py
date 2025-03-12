@@ -9,6 +9,7 @@ class Database:
     client: AsyncIOMotorClient = None
     posts_collection: Collection = None
     prompts_collection: Collection = None
+    users_collection: Collection = None  # Add this line
 
 db = Database()
 
@@ -22,10 +23,13 @@ async def connect_to_mongo():
         # Initialize collections
         db.posts_collection = db.client[settings.mongodb_name]["posts"]
         db.prompts_collection = db.client[settings.mongodb_name]["prompts"]
+        db.users_collection = db.client[settings.mongodb_name]["users"]  # Add this line
         
         # Create indexes
         await db.posts_collection.create_index("created_at")
         await db.prompts_collection.create_index("template")
+        await db.users_collection.create_index("google_id", unique=True)  # Add this line
+        await db.users_collection.create_index("email", unique=True)      # Add this line
         
         logger.info("Database initialized successfully")
     except Exception as e:

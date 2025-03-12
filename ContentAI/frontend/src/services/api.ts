@@ -3,6 +3,11 @@ import { GenerationRequest, GenerationResponse, StoredPost, StoredPrompt } from 
 const API_BASE_URL = "http://localhost:8000";
 const MAX_FILE_SIZE = 50 * 1024; // 50KB per file (approximately 4-5 pages of text)
 
+const getAuthHeaders = (): HeadersInit => {
+  const token = localStorage.getItem('authToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const generatePost = async (request: GenerationRequest): Promise<GenerationResponse> => {
     try {
         console.log('Attempting to generate post with request:', request);
@@ -31,6 +36,9 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
 
         const response = await fetch(`${API_BASE_URL}/api/generate`, {
             method: 'POST',
+            headers: {
+                ...getAuthHeaders(),
+            },
             body: formData, // Send as FormData instead of JSON
         });
 
@@ -64,7 +72,10 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
 
 export const getPostHistory = async (limit = 10, skip = 0): Promise<StoredPost[]> => {
     const response = await fetch(
-        `${API_BASE_URL}/api/history?limit=${limit}&skip=${skip}`  // Add /api in the endpoint
+        `${API_BASE_URL}/api/history?limit=${limit}&skip=${skip}`,
+        {
+            headers: getAuthHeaders(),
+        }
     );
     if (!response.ok) throw new Error('Failed to fetch history');
     return response.json();
@@ -72,7 +83,10 @@ export const getPostHistory = async (limit = 10, skip = 0): Promise<StoredPost[]
 
 export const getPopularPrompts = async (limit = 5): Promise<StoredPrompt[]> => {
     const response = await fetch(
-        `${API_BASE_URL}/api/popular-prompts?limit=${limit}`  // Add /api in the endpoint
+        `${API_BASE_URL}/api/popular-prompts?limit=${limit}`,
+        {
+            headers: getAuthHeaders(),
+        }
     );
     if (!response.ok) throw new Error('Failed to fetch popular prompts');
     return response.json();

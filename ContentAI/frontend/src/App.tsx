@@ -1,12 +1,16 @@
 import "./styles/index.css";
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Create from "./pages/Create";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Login from './pages/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -37,22 +41,34 @@ function App() {
   return (
     <React.StrictMode>
       <ErrorBoundary>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Router>
-            <div className="app-container">
-              <Header />
-              <main className="main-content">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/create" element={<Create />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </Router>
-        </Suspense>
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Router>
+                <div className="app-container">
+                  <Header />
+                  <main className="main-content">
+                    <Routes>
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/" element={<Home />} />
+                      <Route 
+                        path="/create" 
+                        element={
+                          <ProtectedRoute>
+                            <Create />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                </div>
+              </Router>
+            </Suspense>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </ErrorBoundary>
     </React.StrictMode>
   );

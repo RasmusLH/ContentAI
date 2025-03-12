@@ -7,14 +7,14 @@ const Contact: React.FC = () => {
       <div className="contact-links">
         <div className="contact-item">
           <h3>LinkedIn</h3>
-          <a href="#" className="social-link linkedin">
+          <a href="https://www.linkedin.com/in/rlha" className="social-link linkedin">
             Connect on LinkedIn
           </a>
         </div>
         
         <div className="contact-item">
           <h3>GitHub</h3>
-          <a href="#" className="social-link github">
+          <a href="https://github.com/RasmusLH" className="social-link github">
             View Projects on GitHub
           </a>
         </div>

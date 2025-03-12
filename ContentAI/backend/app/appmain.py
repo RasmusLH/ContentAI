@@ -4,6 +4,7 @@ import logging
 import time
 from .routes import router
 from .database import connect_to_mongo, close_mongo_connection
+from .routes import auth
 
 # Configure root logger
 logging.basicConfig(
@@ -64,6 +65,7 @@ async def favicon():
 
 # Mount the router directly without prefix - it already has /api prefix
 app.include_router(router)
+app.include_router(auth.router)  # Add this line
 
 # Debug endpoint
 @app.get("/debug/routes")

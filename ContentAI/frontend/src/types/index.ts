@@ -28,3 +28,10 @@ export interface StoredPrompt extends GenerationRequest {
     created_at: string;
     use_count: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  picture?: string;
+}

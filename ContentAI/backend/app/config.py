@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     allowed_origins: list = ["http://localhost:3000"]
     mongodb_url: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     mongodb_name: str = os.getenv("MONGODB_NAME", "contentai_db")
+    jwt_secret: str = os.getenv("JWT_SECRET", "your-secret-key")
+    jwt_algorithm: str = "HS256"
+    jwt_expiration: int = 30  # days
+    google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
 
     class Config:
         env_file = ".env"
