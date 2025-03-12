@@ -1,9 +1,23 @@
 /* Base styles */
+:root {
+  --primary: #0a66c2;
+  --primary-dark: #004182;
+  --secondary: #5e5adb;
+  --accent: #00a0dc;
+  --background: #f3f6f8;
+  --surface: #ffffff;
+  --text: #191919;
+  --text-secondary: #666666;
+  --error: #dc3545;
+  --success: #28a745;
+}
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f3f9fc;
-  color: #333;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  line-height: 1.6;
 }
 
 /* App container */
@@ -45,30 +59,49 @@ body {
 
 /* Button styling */
 button {
-  background-color: #0077b5;
+  background-color: var(--primary);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #005d8c;
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Input and textarea styling */
 input[type="text"],
 textarea {
-  border: 1px solid #0077b5;
-  border-radius: 4px;
-  padding: 8px;
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 12px;
   font-size: 16px;
   width: 100%;
   box-sizing: border-box;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
 }
 
 /* Progress bar animation */
@@ -114,9 +147,9 @@ textarea {
 
 /* Header Styles */
 .app-header {
-  background-color: #0077b5;
-  padding: 1rem;
-  color: white;
+  background: var(--primary);
+  opacity: 0.9;
+  padding: 24px 0;
 }
 
 .header-content {
@@ -129,6 +162,12 @@ textarea {
 
 .header-content h1 {
   margin: 0;
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  position: relative;
+  padding: 0.2em 0;
 }
 
 .header-content nav ul {
@@ -140,7 +179,7 @@ textarea {
 }
 
 .header-content nav a {
-  color: white;
+  color: rgb(226, 228, 233);
   text-decoration: none;
   font-weight: 500;
 }
@@ -151,10 +190,10 @@ textarea {
 
 /* Footer Styles */
 .app-footer {
-  background-color: #2c3e50;
-  color: white;
-  padding: 0.5rem 0;
+  background-color: #2c3e50;  /* Changed from var(--text) to a softer dark blue */
+  padding: 24px 0;  /* Reduced from 48px to 24px */
   margin-top: auto;
+  color: #ffffff;  /* Ensure all text is white by default */
 }
 
 .footer-content {
@@ -163,11 +202,18 @@ textarea {
   padding: 0 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  gap: 1rem;  /* Reduced from 2rem */
 }
 
-.footer-section h3, .footer-section h4 {
+.footer-section h3, 
+.footer-section h4 {
   margin-top: 0.5rem;
+  color: #ffffff;  /* Explicitly set heading colors */
+}
+
+.footer-section p {
+  color: #ffffff;  /* Explicitly set paragraph colors */
+  font-size: 0.9rem;  /* Slightly smaller text */
 }
 
 .footer-section ul {
@@ -177,15 +223,18 @@ textarea {
 }
 
 .footer-section ul li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;  /* Reduced from default */
 }
 
 .footer-section a {
-  color: white;
+  color: #ffffff;  /* Ensure links are white */
   text-decoration: none;
+  opacity: 0.9;  /* Slightly dimmed for style */
+  transition: opacity 0.2s;
 }
 
 .footer-section a:hover {
+  opacity: 1;  /* Full opacity on hover */
   text-decoration: underline;
 }
 
@@ -304,8 +353,14 @@ textarea {
 
 .progress-bar-fill {
   height: 100%;
-  background-color: #0077b5;
-  animation: progress 2s linear infinite;
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--secondary) 50%,
+    var(--accent) 100%
+  );
+  animation: gradient 2s linear infinite;
+  background-size: 200% 100%;
 }
 
 .result-section {
@@ -313,13 +368,13 @@ textarea {
 }
 
 .generated-post {
-  width: 100%;
-  min-height: 300px;
-  margin: 10px 0;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  resize: vertical;
+  background-color: var(--background);
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .action-buttons {
@@ -341,16 +396,14 @@ textarea {
 
 .template-button {
   flex: 1;
-  background-color: white;
-  border: 2px solid #0077b5;
-  color: #0077b5;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
+  background-color: var(--surface);
+  border: 2px solid #e1e1e1;
+  padding: 16px;
+  border-radius: 12px;
   transition: all 0.3s ease;
   min-width: 0;
   text-align: center;
+  color: var(--text); /* Add explicit text color */
 }
 
 .template-button-content {
@@ -361,21 +414,31 @@ textarea {
 
 .template-button-content strong {
   font-size: 14px;
+  color: var(--text); /* Ensure heading is visible */
 }
 
 .template-button-content small {
   font-size: 11px;
   opacity: 0.8;
   white-space: normal;
+  color: var(--text-secondary); /* Make description text darker */
 }
 
 .template-button.active {
-  background-color: #0077b5;
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Only change text color to white when button is active */
+.template-button.active .template-button-content strong,
+.template-button.active .template-button-content small {
   color: white;
 }
 
 .template-button:hover {
-  background-color: #f0f7fa;
+  border-color: var(--primary);
+  background-color: rgba(10, 102, 194, 0.05);
 }
 
 .template-button.active:hover {
@@ -405,6 +468,11 @@ textarea {
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
+  background-color: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 32px;
+  margin-top: 24px;
 }
 
 .post-generator-input {
@@ -422,10 +490,10 @@ textarea {
 .preview-content {
   position: relative;
   top: 20px;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--surface);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* Preview Loading Overlay */
@@ -494,11 +562,15 @@ textarea {
 }
 
 .error-message {
-  color: #dc3545;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 15px;
-  text-align: center;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--error);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

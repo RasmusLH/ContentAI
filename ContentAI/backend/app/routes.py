@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, File, UploadFile, Form
 import logging
 from datetime import datetime
+from typing import List
 from .database import db
 from .schemas import GenerationRequest, TEMPLATE_PROMPTS  # Add TEMPLATE_PROMPTS import
 from .services.model_service import ModelService
@@ -10,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 # Define constants
 MIN_WORDS = 5
+MAX_FILE_SIZE = 50 * 1024  # 50KB per file (approximately 4-5 pages of text)
+MAX_TOTAL_SIZE = 200 * 1024  # 200KB total for all files combined
 
 # Initialize services
 model_service = ModelService()
@@ -18,16 +21,53 @@ generation_service = GenerationService(model_service)
 router = APIRouter(prefix="/api", tags=["generation"])
 
 @router.post("/generate")
-async def generate_post(request: GenerationRequest):
+async def generate_post(
+    template: str = Form(...),
+    objective: str = Form(...),
+    context: str = Form(...),
+    documents: List[UploadFile] = File(None)
+):
     try:
-        template_base = TEMPLATE_PROMPTS.get(request.template)
+        template_base = TEMPLATE_PROMPTS.get(template)
         if not template_base:
             raise HTTPException(status_code=400, detail="Invalid template type")
-            
+
+        # Validate total file size
+        total_size = 0
+        if documents:
+            for doc in documents:
+                content = await doc.read()
+                size = len(content)
+                if size > MAX_FILE_SIZE:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"File {doc.filename} exceeds maximum size of 50KB"
+                    )
+                total_size += size
+                if total_size > MAX_TOTAL_SIZE:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Total size of all files exceeds 200KB"
+                    )
+                # Reset file position for later reading
+                await doc.seek(0)
+
+        # Process uploaded documents
+        document_texts = []
+        if documents:
+            for doc in documents:
+                content = await doc.read()
+                try:
+                    text = content.decode('utf-8')
+                    document_texts.append(text)
+                except UnicodeDecodeError:
+                    logger.warning(f"Could not decode file {doc.filename} - skipping")
+        
         generated_text = generation_service.generate_text(
             template_base,
-            request.objective,
-            request.context
+            objective,
+            context,
+            document_texts
         )
         
         if not generated_text or len(generated_text.split()) < MIN_WORDS:
@@ -35,9 +75,9 @@ async def generate_post(request: GenerationRequest):
             
         # Store result
         post_dict = {
-            "template": request.template,
-            "objective": request.objective,
-            "context": request.context,
+            "template": template,
+            "objective": objective,
+            "context": context,
             "generated_content": generated_text,
             "created_at": datetime.utcnow()
         }

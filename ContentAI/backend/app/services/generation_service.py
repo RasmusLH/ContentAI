@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from openai.types.chat import ChatCompletion
 from .model_service import ModelService
 from ..config import settings
@@ -24,10 +24,20 @@ class GenerationService:
             "8. Ensure hashtags are relevant and strategic"
         )
 
-    def _create_user_prompt(self, template: str, objective: str, context: str) -> str:
-        return (
+    def _create_user_prompt(self, template: str, objective: str, context: str, document_texts: Optional[List[str]] = None) -> str:
+        prompt = (
             f"Topic: {objective}\n\n"
             f"Context: {context}\n\n"
+        )
+        
+        if document_texts and len(document_texts) > 0:
+            prompt += "\nAdditional Context from Documents:\n"
+            for i, text in enumerate(document_texts, 1):
+                # Take first 1000 chars of each document to avoid token limits
+                summary = text[:1000] + "..." if len(text) > 1000 else text
+                prompt += f"Document {i}:\n{summary}\n\n"
+        
+        prompt += (
             f"Template Guidelines: {template}\n\n"
             "Create a LinkedIn post that includes:\n"
             "- A compelling headline\n"
@@ -35,6 +45,8 @@ class GenerationService:
             "- A clear call-to-action\n"
             "- 2-3 relevant hashtags"
         )
+        
+        return prompt
 
     def _validate_response(self, response: ChatCompletion) -> None:
         if not response.choices:
@@ -44,7 +56,13 @@ class GenerationService:
         if not response.choices[0].message.content:
             raise ValueError("Empty message content")
 
-    def generate_text(self, template: str, request_objective: str, request_context: str) -> str:
+    def generate_text(
+        self, 
+        template: str, 
+        request_objective: str, 
+        request_context: str,
+        document_texts: Optional[List[str]] = None
+    ) -> str:
         try:
             client = self.model_service.get_model()
             response = client.chat.completions.create(
@@ -52,7 +70,7 @@ class GenerationService:
                 messages=[
                     {"role": "system", "content": self._create_system_prompt()},
                     {"role": "user", "content": self._create_user_prompt(
-                        template, request_objective, request_context
+                        template, request_objective, request_context, document_texts
                     )}
                 ],
                 max_tokens=settings.max_tokens,

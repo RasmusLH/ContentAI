@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
     <footer className="app-footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>ContentAI</h3>
+          <h3>Linkedinker</h3>
           <p>Empowering your social media presence with AI</p>
         </div>
         <div className="footer-section">
@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
         <div className="footer-section">
-          <p>&copy; {new Date().getFullYear()} ContentAI. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Linkedinker. All rights reserved.</p>
         </div>
       </div>
     </footer>

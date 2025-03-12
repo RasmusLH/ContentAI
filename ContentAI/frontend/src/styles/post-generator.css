@@ -1,0 +1,248 @@
+.post-generator-container {
+  display: flex;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+  margin-top: 24px;
+  background-color: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Form styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+}
+
+/* Template buttons */
+.template-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.template-button {
+  flex: 1;
+  background-color: var(--surface);
+  border: 2px solid #e1e1e1;
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  min-width: 0;
+  text-align: center;
+  color: var(--text);
+}
+
+.template-button-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.template-button-content strong {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.template-button-content small {
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: normal;
+  color: var(--text-secondary);
+}
+
+.template-button.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.template-button.active .template-button-content strong,
+.template-button.active .template-button-content small {
+  color: white;
+}
+
+.template-button:hover {
+  border-color: var(--primary);
+  background-color: rgba(10, 102, 194, 0.05);
+}
+
+.template-button.active:hover {
+  background-color: var(--primary-dark);
+}
+
+/* File Upload */
+.file-upload {
+  border: 2px dashed var(--primary);
+  padding: 20px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #f8f9fa;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-input-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.custom-file-button {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-button:hover {
+  background: var(--primary-dark);
+}
+
+.file-help {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+/* Preview Section */
+.post-generator-input {
+  flex: 2;
+  padding-right: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.post-generator-preview {
+  flex: 1;
+  position: sticky;
+  top: 0;
+}
+
+.preview-content {
+  position: relative;
+  top: 20px;
+  background: var(--surface);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.generated-post {
+  background-color: var(--background);
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+  font-size: 16px;
+  line-height: 1.6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Loading States */
+.preview-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--secondary) 50%,
+    var(--accent) 100%
+  );
+  animation: gradient 2s linear infinite;
+  background-size: 200% 100%;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-buttons button {
+  flex: 1;
+}
+
+/* Empty State */
+.empty-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 2px dashed #ddd;
+  color: var(--text-secondary);
+}
+
+/* Error Message */
+.error-message {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--error);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

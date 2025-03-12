@@ -1,19 +1,37 @@
 import { GenerationRequest, GenerationResponse, StoredPost, StoredPrompt } from '../types';
 
 const API_BASE_URL = "http://localhost:8000";
+const MAX_FILE_SIZE = 50 * 1024; // 50KB per file (approximately 4-5 pages of text)
 
 export const generatePost = async (request: GenerationRequest): Promise<GenerationResponse> => {
     try {
         console.log('Attempting to generate post with request:', request);
         console.log('Sending request to:', `${API_BASE_URL}/api/generate`);  // Add /api in the endpoint
         
-        const response = await fetch(`${API_BASE_URL}/api/generate`, {  // Add /api in the endpoint
+        // Validate file sizes
+        if (request.documents && request.documents.length > 0) {
+            for (const file of request.documents) {
+                if (file.size > MAX_FILE_SIZE) {
+                    throw new Error(`File ${file.name} is too large. Maximum size is 50KB (about 4-5 pages of text)`);
+                }
+            }
+        }
+
+        const formData = new FormData();
+        formData.append('template', request.template);
+        formData.append('objective', request.objective);
+        formData.append('context', request.context);
+        
+        // Add documents if they exist
+        if (request.documents && request.documents.length > 0) {
+            request.documents.forEach((file, index) => {
+                formData.append(`document_${index}`, file);
+            });
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/generate`, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(request),
+            body: formData, // Send as FormData instead of JSON
         });
 
         console.log('Response status:', response.status);
