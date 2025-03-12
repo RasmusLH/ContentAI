@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 from .schemas import TemplateType
+from bson import ObjectId
 
 class StoredPost(BaseModel):
     id: Optional[str] = Field(default=None, alias="_id")  # Let MongoDB handle ID
@@ -20,9 +21,15 @@ class StoredPrompt(BaseModel):
     use_count: int = 1  # Start at 1 since it's being used
 
 class User(BaseModel):
-    id: str = Field(default=None, alias="_id")
+    id: Optional[str] = Field(default=None, alias="_id")  # Changed from str to Optional[str]
     email: str
     name: str
     picture: Optional[str] = None
     google_id: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            ObjectId: str  # Add this to handle ObjectId serialization
+        }

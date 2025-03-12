@@ -8,6 +8,7 @@ from ..config import settings
 from ..models import User
 from ..database import db
 import logging
+from bson import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,10 @@ class AuthService:
                     "created_at": datetime.utcnow()
                 }
                 result = await db.users_collection.insert_one(user_dict)
-                user_dict["_id"] = result.inserted_id
+                user_dict["_id"] = str(result.inserted_id)  # Convert ObjectId to string
+            else:
+                # Convert existing _id to string
+                user_dict["_id"] = str(user_dict["_id"])
             
             return User(**user_dict)
         except Exception as e:

@@ -205,8 +205,18 @@
     var(--secondary) 50%,
     var(--accent) 100%
   );
-  animation: gradient 2s linear infinite;
+  animation: progressAnimation 2s ease infinite;
   background-size: 200% 100%;
+  width: 100%;
+}
+
+@keyframes progressAnimation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Action Buttons */

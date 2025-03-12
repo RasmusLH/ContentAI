@@ -2,9 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import time
-from .routes import router
+from .routes import api_router, auth_router
 from .database import connect_to_mongo, close_mongo_connection
-from .routes import auth
 
 # Configure root logger
 logging.basicConfig(
@@ -63,9 +62,9 @@ async def favicon():
     # Adjust the path below if your favicon.ico is stored elsewhere
     return FileResponse("static/favicon.ico")
 
-# Mount the router directly without prefix - it already has /api prefix
-app.include_router(router)
-app.include_router(auth.router)  # Add this line
+# Mount the routers
+app.include_router(api_router)
+app.include_router(auth_router)
 
 # Debug endpoint
 @app.get("/debug/routes")

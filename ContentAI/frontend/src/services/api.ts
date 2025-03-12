@@ -10,6 +10,9 @@ const getAuthHeaders = (): HeadersInit => {
 
 export const generatePost = async (request: GenerationRequest): Promise<GenerationResponse> => {
     try {
+        if (!request.template || !request.objective || !request.context) {
+            throw new Error('Missing required fields');
+        }
         console.log('Attempting to generate post with request:', request);
         console.log('Sending request to:', `${API_BASE_URL}/api/generate`);  // Add /api in the endpoint
         
@@ -41,6 +44,12 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
             },
             body: formData, // Send as FormData instead of JSON
         });
+
+        if (response.status === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            throw new Error('Authentication failed. Please login again.');
+        }
 
         console.log('Response status:', response.status);
         
