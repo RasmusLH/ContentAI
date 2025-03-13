@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import Posts from './pages/Posts';
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -51,11 +52,12 @@ function App() {
                     <Routes>
                       <Route path="/login" element={<Login />} />
                       <Route path="/" element={<Home />} />
+                      <Route path="/create" element={<Create />} />
                       <Route 
-                        path="/create" 
+                        path="/posts" 
                         element={
                           <ProtectedRoute>
-                            <Create />
+                            <Posts />
                           </ProtectedRoute>
                         } 
                       />

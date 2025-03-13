@@ -2,7 +2,8 @@ import React, { useState, ChangeEvent } from "react";
 import { TemplateType } from "../types";
 import { GenerationRequest } from "../types";
 import { TEMPLATES } from "../constants";
-import { generatePost } from "../services/api";
+import { generatePost, savePost } from "../services/api";
+import { useAuth } from "../contexts/AuthContext"; // added
 
 const PostGenerator: React.FC = () => {
   const [formData, setFormData] = useState<GenerationRequest>({
@@ -14,6 +15,7 @@ const PostGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedPost, setGeneratedPost] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth(); // added
 
   const handleTemplateSelect = (templateId: TemplateType) => {
     setFormData(prev => ({
@@ -70,15 +72,29 @@ const PostGenerator: React.FC = () => {
     }
   };
 
+  // New handler for saving posts
+  const handleSave = async () => {
+    try {
+      await savePost({
+        template: formData.template,
+        objective: formData.objective,
+        context: formData.context,
+        generated_content: generatedPost,
+      });
+      alert("Post saved successfully");
+    } catch (err) {
+      console.error("Error saving post:", err);
+      setError("Failed to save post. Please try again.");
+    }
+  };
+
   return (
     <div className="post-generator-container">
       <div className="post-generator-input">
         <h2>Create Engaging LinkedIn Posts</h2>
         
         <div className="form-group">
-          <label>
-            <strong>Select Template</strong>
-          </label>
+          <label><strong>Select Template</strong></label>
           <div className="template-buttons">
             {TEMPLATES.map(template => (
               <button
@@ -129,28 +145,18 @@ const PostGenerator: React.FC = () => {
         )}
 
         <div className="form-group">
-          <label>
-            <strong>Supporting Documents</strong>
-          </label>
+          <label><strong>Supporting Documents</strong></label>
           <div className="file-upload">
             <div className="file-input-wrapper">
               <div className="custom-file-button">Choose Files</div>
-              <input
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                accept=".pdf,.doc,.docx,.txt"
-              />
+              <input type="file" multiple onChange={handleFileUpload} accept=".pdf,.doc,.docx,.txt" />
             </div>
             <p className="file-help">Upload relevant documents (PDF, DOC, TXT)</p>
           </div>
         </div>
 
         <div className="form-group">
-          <button 
-            onClick={handleGenerate} 
-            disabled={isLoading || !formData.objective || !formData.context}
-          >
+          <button onClick={handleGenerate} disabled={isLoading || !formData.objective || !formData.context}>
             {isLoading ? "Generating..." : "Generate Post"}
           </button>
         </div>
@@ -169,18 +175,14 @@ const PostGenerator: React.FC = () => {
           )}
           {generatedPost ? (
             <>
-              <textarea
-                value={generatedPost}
-                onChange={(e) => setGeneratedPost(e.target.value)}
-                className="generated-post"
-                placeholder="Your generated post will appear here..."
-                rows={15}
-              />
+              <textarea value={generatedPost} onChange={(e) => setGeneratedPost(e.target.value)}
+                className="generated-post" placeholder="Your generated post will appear here..." rows={15} />
               <div className="action-buttons">
                 <button onClick={handleGenerate}>Regenerate</button>
-                <button onClick={() => navigator.clipboard.writeText(generatedPost)}>
-                  Copy to Clipboard
-                </button>
+                <button onClick={() => navigator.clipboard.writeText(generatedPost)}>Copy to Clipboard</button>
+                {user && ( // show Save Post button only when logged in
+                  <button onClick={handleSave}>Save Post</button>
+                )}
               </div>
             </>
           ) : (

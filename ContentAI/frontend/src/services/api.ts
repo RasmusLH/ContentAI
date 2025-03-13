@@ -3,18 +3,13 @@ import { GenerationRequest, GenerationResponse, StoredPost, StoredPrompt } from 
 const API_BASE_URL = "http://localhost:8000";
 const MAX_FILE_SIZE = 50 * 1024; // 50KB per file (approximately 4-5 pages of text)
 
-const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('authToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
 export const generatePost = async (request: GenerationRequest): Promise<GenerationResponse> => {
     try {
         if (!request.template || !request.objective || !request.context) {
             throw new Error('Missing required fields');
         }
         console.log('Attempting to generate post with request:', request);
-        console.log('Sending request to:', `${API_BASE_URL}/api/generate`);  // Add /api in the endpoint
+        console.log('Sending request to:', `${API_BASE_URL}/api/generate`);
         
         // Validate file sizes
         if (request.documents && request.documents.length > 0) {
@@ -36,13 +31,13 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
                 formData.append(`document_${index}`, file);
             });
         }
-
+        
+        const token = localStorage.getItem('authToken');
         const response = await fetch(`${API_BASE_URL}/api/generate`, {
             method: 'POST',
-            headers: {
-                ...getAuthHeaders(),
-            },
-            body: formData, // Send as FormData instead of JSON
+            // Do not set 'Content-Type' when sending FormData; include auth header if token exists.
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: formData,
         });
 
         if (response.status === 401) {
@@ -56,7 +51,6 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('API Error Response:', errorData);
-            // Additional logging of response headers for diagnostic details
             console.error('Response Headers:', response.headers);
             throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
         }
@@ -80,11 +74,10 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
 };
 
 export const getPostHistory = async (limit = 10, skip = 0): Promise<StoredPost[]> => {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(
         `${API_BASE_URL}/api/history?limit=${limit}&skip=${skip}`,
-        {
-            headers: getAuthHeaders(),
-        }
+        { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
     );
     if (!response.ok) throw new Error('Failed to fetch history');
     return response.json();
@@ -92,11 +85,51 @@ export const getPostHistory = async (limit = 10, skip = 0): Promise<StoredPost[]
 
 export const getPopularPrompts = async (limit = 5): Promise<StoredPrompt[]> => {
     const response = await fetch(
-        `${API_BASE_URL}/api/popular-prompts?limit=${limit}`,
-        {
-            headers: getAuthHeaders(),
-        }
+        `${API_BASE_URL}/api/popular-prompts?limit=${limit}`
     );
     if (!response.ok) throw new Error('Failed to fetch popular prompts');
     return response.json();
+};
+
+export const savePost = async (post: {
+  template: string;
+  objective: string;
+  context: string;
+  generated_content: string;
+}): Promise<void> => {
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/posts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(post)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to save post');
+  }
+};
+
+export const deletePost = async (postId: string): Promise<void> => {
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete post');
+  }
 };

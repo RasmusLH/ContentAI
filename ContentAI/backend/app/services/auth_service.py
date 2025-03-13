@@ -1,14 +1,12 @@
 from datetime import datetime, timedelta
-from typing import Optional
 from jose import jwt, JWTError
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Header
 from ..config import settings
 from ..models import User
 from ..database import db
 import logging
-from bson import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +24,7 @@ class AuthService:
             )
             return idinfo
         except Exception as e:
-            logger.error(f"Google token verification failed: {str(e)}")
+            logger.exception("Google token verification failed")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid Google token"
@@ -49,14 +47,13 @@ class AuthService:
                     "created_at": datetime.utcnow()
                 }
                 result = await db.users_collection.insert_one(user_dict)
-                user_dict["_id"] = str(result.inserted_id)  # Convert ObjectId to string
+                user_dict["_id"] = str(result.inserted_id)
             else:
-                # Convert existing _id to string
                 user_dict["_id"] = str(user_dict["_id"])
             
             return User(**user_dict)
         except Exception as e:
-            logger.error(f"Error in get_or_create_user: {str(e)}")
+            logger.exception("Error in get_or_create_user")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error processing user data"
@@ -68,7 +65,7 @@ class AuthService:
         try:
             return jwt.encode(to_encode, self.jwt_secret, self.jwt_algorithm)
         except Exception as e:
-            logger.error(f"Token creation failed: {str(e)}")
+            logger.exception("Token creation failed")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Could not create access token"
@@ -89,3 +86,12 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token"
             )
+
+    def get_token_from_header(self, authorization: str = Header(None)) -> str:
+        logger.info(f"Authorization header received: {authorization}")  # Added logging
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid authorization header"
+            )
+        return authorization.split(" ")[1]

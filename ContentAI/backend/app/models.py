@@ -6,6 +6,7 @@ from bson import ObjectId
 
 class StoredPost(BaseModel):
     id: Optional[str] = Field(default=None, alias="_id")  # Let MongoDB handle ID
+    user_id: str
     template: TemplateType
     objective: str
     context: str

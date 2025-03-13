@@ -26,6 +26,10 @@ async def connect_to_mongo():
         db.users_collection = db.client[settings.mongodb_name]["users"]  # Add this line
         
         # Create indexes
+        await db.posts_collection.create_index([
+            ("user_id", 1),
+            ("created_at", -1)
+        ])
         await db.posts_collection.create_index("created_at")
         await db.prompts_collection.create_index("template")
         await db.users_collection.create_index("google_id", unique=True)  # Add this line
