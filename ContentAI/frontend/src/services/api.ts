@@ -1,4 +1,4 @@
-import { GenerationRequest, GenerationResponse, StoredPost, StoredPrompt } from '../types';
+import { GenerationRequest, GenerationResponse, StoredPost, StoredPrompt, PaginatedResponse } from '../types';
 
 const API_BASE_URL = "http://localhost:8000";
 const MAX_FILE_SIZE = 50 * 1024; // 50KB per file (approximately 4-5 pages of text)
@@ -73,15 +73,29 @@ export const generatePost = async (request: GenerationRequest): Promise<Generati
     }
 };
 
-export const getPostHistory = async (limit = 10, skip = 0): Promise<StoredPost[]> => {
+export const getPostHistory = async (limit = 10, skip = 0, search?: string): Promise<PaginatedResponse<StoredPost>> => {
     const token = localStorage.getItem('authToken');
     const response = await fetch(
-        `${API_BASE_URL}/api/history?limit=${limit}&skip=${skip}`,
+        `${API_BASE_URL}/api/history?limit=${limit}&skip=${skip}${search ? `&search=${encodeURIComponent(search)}` : ''}`,
         { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
     );
-    if (!response.ok) throw new Error('Failed to fetch history');
-    return response.json();
-};
+    
+    if (!response.ok) {
+        throw new Error('Failed to fetch history');
+    }
+    
+    const data = await response.json();
+    if (!data.posts || !Array.isArray(data.posts)) {
+        throw new Error('Invalid response format');
+    }
+    
+    return {
+        posts: data.posts,
+        total: data.total || 0,
+        page: data.page || 1,
+        totalPages: data.totalPages || 1
+    };
+}
 
 export const getPopularPrompts = async (limit = 5): Promise<StoredPrompt[]> => {
     const response = await fetch(

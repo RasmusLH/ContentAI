@@ -17,3 +17,12 @@ pydantic-settings
 
 # AI Integration
 openai
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.20.0
+pytest-cov>=4.0.0
+httpx>=0.24.0
+aioresponses>=0.7.4
+mongomock>=4.1.2
+python-jose[cryptography]>=3.3.0

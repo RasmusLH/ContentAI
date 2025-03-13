@@ -12,6 +12,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import Posts from './pages/Posts';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -44,31 +45,33 @@ function App() {
       <ErrorBoundary>
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
           <AuthProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Router>
-                <div className="app-container">
-                  <Header />
-                  <main className="main-content">
-                    <Routes>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/" element={<Home />} />
-                      <Route path="/create" element={<Create />} />
-                      <Route 
-                        path="/posts" 
-                        element={
-                          <ProtectedRoute>
-                            <Posts />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </div>
-              </Router>
-            </Suspense>
+            <NotificationProvider>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Router>
+                  <div className="app-container">
+                    <Header />
+                    <main className="main-content">
+                      <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/create" element={<Create />} />
+                        <Route 
+                          path="/posts" 
+                          element={
+                            <ProtectedRoute>
+                              <Posts />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </div>
+                </Router>
+              </Suspense>
+            </NotificationProvider>
           </AuthProvider>
         </GoogleOAuthProvider>
       </ErrorBoundary>

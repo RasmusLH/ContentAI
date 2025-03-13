@@ -19,9 +19,8 @@ class GenerationService:
             "3. Include specific, actionable insights\n"
             "4. Use clear paragraph breaks for readability\n"
             "5. End with a compelling call-to-action\n"
-            "6. Keep paragraphs concise (2-3 sentences)\n"
+            "6. Keep paragraphs concise (2-4 sentences)\n"
             "7. Format using LinkedIn-optimized structure\n"
-            "8. Ensure hashtags are relevant and strategic"
         )
 
     def _create_user_prompt(self, template: str, objective: str, context: str, document_texts: Optional[List[str]] = None) -> str:

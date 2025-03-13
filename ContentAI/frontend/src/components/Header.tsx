@@ -8,23 +8,23 @@ const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="header-content">
-        <h1><span>Linkedinker</span></h1>
-        <nav>
+        <div className="header-logo">
+          <h1><span>Linkedinker</span></h1>
+        </div>
+        <nav className="header-nav">
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/create">Create</Link></li>
-            {user && <li><Link to="/posts">Posts</Link></li>}
+            <li><Link to="/posts">Posts</Link></li>
             <li><Link to="/about">About</Link></li>
             <li><Link to="/contact">Contact</Link></li>
-            {user ? (
-              <li>
-                <button onClick={logout}>Logout</button>
-              </li>
-            ) : (
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            )}
+            <li>
+              {user ? (
+                <button onClick={logout} className="auth-button">Logout</button>
+              ) : (
+                <Link to="/login" className="auth-button">Login</Link>
+              )}
+            </li>
           </ul>
         </nav>
       </div>

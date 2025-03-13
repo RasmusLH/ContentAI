@@ -4,12 +4,13 @@ import logging
 import time
 from .routes import api_router, auth_router
 from .database import connect_to_mongo, close_mongo_connection
+from .utils.logging_config import setup_logging
+from .utils.error_handlers import APIError, handle_api_error
+import uuid
+import traceback
 
-# Configure root logger
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Configure logging first
+setup_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="LinkedIn Post Generator", debug=True)
@@ -23,19 +24,49 @@ app.add_middleware(
     allow_credentials=False
 )
 
-# Add request logging middleware
+# Add error handler
+@app.exception_handler(APIError)
+async def api_error_handler(request: Request, exc: APIError):
+    return await handle_api_error(exc)
+
+# Update request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    start_time = time.time()
-    logger.info(f"Incoming request: {request.method} {request.url.path}")
-    logger.info(f"Headers: {request.headers}")
+    request_id = str(uuid.uuid4())
+    logger.info(
+        "Incoming request",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "url": str(request.url),
+            "client_host": request.client.host if request.client else None,
+            "headers": dict(request.headers)
+        }
+    )
+    
     try:
+        start_time = time.time()
         response = await call_next(request)
         duration = time.time() - start_time
-        logger.info(f"Request completed - Duration: {duration:.2f}s - Status: {response.status_code}")
+        
+        logger.info(
+            "Request completed",
+            extra={
+                "request_id": request_id,
+                "duration": f"{duration:.2f}s",
+                "status_code": response.status_code
+            }
+        )
         return response
     except Exception as e:
-        logger.error(f"Request failed: {str(e)}")
+        logger.error(
+            "Request failed",
+            extra={
+                "request_id": request_id,
+                "error": str(e),
+                "traceback": traceback.format_exc()
+            }
+        )
         raise
 
 @app.on_event("startup")

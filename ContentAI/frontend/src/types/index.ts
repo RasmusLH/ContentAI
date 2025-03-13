@@ -35,3 +35,10 @@ export interface User {
   name: string;
   picture?: string;
 }
+
+export interface PaginatedResponse<T> {
+  posts: T[];
+  total: number;
+  page: number;
+  totalPages: number;
+}

@@ -91,8 +91,6 @@ const PostGenerator: React.FC = () => {
   return (
     <div className="post-generator-container">
       <div className="post-generator-input">
-        <h2>Create Engaging LinkedIn Posts</h2>
-        
         <div className="form-group">
           <label><strong>Select Template</strong></label>
           <div className="template-buttons">
