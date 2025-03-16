@@ -4,6 +4,7 @@ import { GenerationRequest } from "../types";
 import { TEMPLATES } from "../constants";
 import { generatePost, savePost, generateImage } from "../services/api";
 import { useAuth } from "../contexts/AuthContext"; // added
+import { withErrorHandling } from '../utils/apiUtils';
 
 const PostGenerator: React.FC = () => {
   const [formData, setFormData] = useState<GenerationRequest>({
@@ -37,74 +38,55 @@ const PostGenerator: React.FC = () => {
     }
   };
 
-  const handleError = (error: unknown, context: string) => {
-    console.error(`Error ${context}:`, error);
-    let errorMsg = "";
-    if (error instanceof Error) {
-      errorMsg = error.message;
-    } else {
-      errorMsg = "An unknown error occurred.";
-    }
-    
-    // Enhance error with hints based on common issues
-    if (errorMsg.toLowerCase().includes("http error")) {
-      errorMsg += " Please ensure the backend server is running and configured properly.";
-    }
-    if (errorMsg.toLowerCase().includes("not found")) {
-      errorMsg += " Please verify the API endpoint.";
-    }
-    
-    setError(`${context} failed: ${errorMsg}`);
+  const handleError = (error: Error) => {
+    setError(error.message);
   };
 
   const handleImageGenerate = async (): Promise<string | null> => {
-    try {
-      setError(null);
-      const response = await generateImage({
-        ...formData,
-        type: 'image'
-      });
-      console.log("Image generation response:", response); // Debug log
-      if (response && response.image_url) {
-        await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            setGeneratedImage(response.image_url);
-            resolve(null);
-          };
-          img.onerror = () => {
-            reject(new Error('Failed to load image'));
-          };
-          img.src = response.image_url;
+    setError(null);
+    
+    return withErrorHandling(
+      async () => {
+        const response = await generateImage({
+          ...formData,
+          type: 'image'
         });
-        return response.image_url;
-      } else if (response && response.error) {
-        throw new Error(response.error);
-      }
-      throw new Error('Invalid image generation response: ' + JSON.stringify(response));
-    } catch (error) {
-      handleError(error, "Image generation");
-      return null;
-    }
+
+        if (response?.image_url) {
+          await new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              setGeneratedImage(response.image_url);
+              resolve();
+            };
+            img.onerror = () => reject(new Error('Failed to load image'));
+            img.src = response.image_url;
+          });
+          return response.image_url;
+        }
+        
+        throw new Error('Invalid image generation response');
+      },
+      { context: 'Image generation', onError: handleError }
+    );
   };
 
   const handleTextGenerate = async (): Promise<string | null> => {
-    try {
-      console.log('Starting post generation with data:', formData);
-      const response = await generatePost({
-        ...formData,
-        type: generationType
-      });
-      console.log('Generation successful:', response);
-      if ('post' in response) {
-        setGeneratedPost(response.post);
-        return response.post;
-      }
-      throw new Error('Invalid text generation response');
-    } catch (error) {
-      handleError(error, "Post generation");
-      return null;
-    }
+    return withErrorHandling(
+      async () => {
+        const response = await generatePost({
+          ...formData,
+          type: generationType
+        });
+        
+        if ('post' in response) {
+          setGeneratedPost(response.post);
+          return response.post;
+        }
+        throw new Error('Invalid text generation response');
+      },
+      { context: 'Post generation', onError: handleError }
+    );
   };
 
   const handleGenerate = async () => {
@@ -146,28 +128,22 @@ const PostGenerator: React.FC = () => {
   };
 
   const handleSave = async () => {
-    try {
-      if (generationType === "image" && generatedImage) {
+    const content = generationType === "image" ? generatedImage : generatedPost;
+    if (!content) return;
+
+    await withErrorHandling(
+      async () => {
         await savePost({
           template: formData.template,
           objective: formData.objective,
           context: formData.context,
-          generated_content: generatedImage,
-          type: "image"
+          generated_content: content,
+          type: generationType === "full" ? "full" : generationType
         });
-      } else if (generatedPost) {
-        await savePost({
-          template: formData.template,
-          objective: formData.objective,
-          context: formData.context,
-          generated_content: generatedPost,
-          type: generationType === "full" ? "full" : "text"
-        });
-      }
-      alert("Content saved successfully");
-    } catch (err) {
-      handleError(err, "Saving content");
-    }
+        alert("Content saved successfully");
+      },
+      { context: 'Saving content', onError: handleError }
+    );
   };
 
   const renderGenerationOptions = () => (

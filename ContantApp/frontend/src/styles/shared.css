@@ -1,0 +1,65 @@
+/* Button Base Styles */
+.button-base {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.button-base:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button-base:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Form Groups */
+.form-group-base {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group-base label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-control-base {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 2px solid #e1e1e1;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-control-base:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+}
+
+/* Card Styles */
+.card-base {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease;
+}
+
+.card-base:hover {
+  transform: translateY(-5px);
+}

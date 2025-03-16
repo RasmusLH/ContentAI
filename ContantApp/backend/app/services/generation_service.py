@@ -12,14 +12,14 @@ class GenerationService:
         self.text_service = TextGenerationService(model_service)
         self.image_service = ImageGenerationService(model_service)
 
-    def generate_text(
+    async def generate_text(
         self, 
         template: str, 
         request_objective: str, 
         request_context: str,
         document_texts: Optional[List[str]] = None
     ) -> str:
-        return self.text_service.generate(template, request_objective, request_context, document_texts)
+        return await self.text_service.generate(template, request_objective, request_context, document_texts)
 
     async def generate_image(
         self, 

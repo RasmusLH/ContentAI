@@ -17,7 +17,6 @@ def get_image_generation_params() -> Dict[str, Any]:
         "model": settings.openai_image_model,
         "n": 1,
         "size": "1024x1024",
-        "quality": "hd",
-        "style": "natural",
+        "quality": "standard",
         "response_format": "url"
     }

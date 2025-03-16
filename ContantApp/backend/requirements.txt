@@ -2,6 +2,7 @@
 fastapi==0.109.0
 uvicorn==0.27.0
 python-multipart==0.0.7
+requests==2.31.0
 
 # Database
 motor==3.3.2

@@ -24,7 +24,7 @@ class PostController:
 
         document_texts = await self.file_service.process_files(documents)
         
-        generated_text = self.generation_service.generate_text(
+        generated_text = await self.generation_service.generate_text(
             template_base,
             objective,
             context,
@@ -41,7 +41,7 @@ class PostController:
             "objective": objective,
             "context": context,
             "generated_content": generated_text,
-        })
+        }, user_id)
             
         return {"post": generated_text}
 
@@ -74,7 +74,7 @@ class PostController:
                 "context": context,
                 "generated_content": image_url,
                 "type": "image"
-            })
+            }, user_id)
 
             return {"image_url": image_url}
         except Exception as e:

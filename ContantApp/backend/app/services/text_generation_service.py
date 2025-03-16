@@ -43,10 +43,10 @@ class TextGenerationService:
         if not response.choices[0].message.content:
             raise ValueError("Empty message content")
 
-    def generate(self, template: str, objective: str, context: str, document_texts: Optional[List[str]] = None) -> str:
+    async def generate(self, template: str, objective: str, context: str, document_texts: Optional[List[str]] = None) -> str:
         try:
             client = self.model_service.get_model()
-            response = client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model=settings.openai_model,
                 messages=[
                     {"role": "system", "content": self._create_system_prompt()},

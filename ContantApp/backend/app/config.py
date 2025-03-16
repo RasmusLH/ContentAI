@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_name: str = "LinkedIn Post Generator"
     api_prefix: str = "/api"
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
-    openai_model: str = "gpt-4o-mini-2025-07-18"
+    openai_model: str = "gpt-3.5-turbo"
     openai_image_model: str = "dall-e-2" 
     max_tokens: int = 1000  # Increased for longer posts
     min_tokens: int = 128

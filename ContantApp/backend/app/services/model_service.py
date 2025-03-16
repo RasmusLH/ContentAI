@@ -40,12 +40,14 @@ class ModelService:
         return response.choices[0].message.content
 
     async def generate_image(self, prompt: str, model: str = None) -> str:
-        # Simplified call matching OpenAI docs standard
-        response = await self.client.images.generate(
-            model = model,
-            prompt = prompt,
-            size = "1024x1024",
-            quality = "standard",
-            n = 1
-        )
+        # Get standardized parameters and add prompt
+        params = get_image_generation_params()
+        params["prompt"] = prompt
+        
+        # Override model if explicitly passed
+        if model:
+            params["model"] = model
+        
+        # Call the API with the correct parameters
+        response = await self.client.images.generate(**params)
         return response.data[0].url

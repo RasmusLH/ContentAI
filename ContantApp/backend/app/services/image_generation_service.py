@@ -20,9 +20,19 @@ class ImageGenerationService:
         )
 
     async def generate(self, template: str, objective: str, context: str) -> str:
-        prompt = self._create_prompt(template, objective, context)
-        return await handle_api_operation(
-            "image generation",
-            self.model_service.generate_image(prompt),
-            "Image generation failed"
-        )
+        try:
+            prompt = self._create_prompt(template, objective, context)
+            logger.info(f"Generating image with prompt: {prompt}")
+            
+            # Explicitly pass the model from settings to ensure it's using dall-e-2
+            result = await handle_api_operation(
+                "image generation",
+                self.model_service.generate_image(prompt, model=settings.openai_image_model),
+                "Image generation failed"
+            )
+            
+            logger.info(f"Image generation successful, URL received: {result[:30]}...")
+            return result
+        except Exception as e:
+            logger.error(f"Image generation error: {str(e)}", exc_info=True)
+            raise
